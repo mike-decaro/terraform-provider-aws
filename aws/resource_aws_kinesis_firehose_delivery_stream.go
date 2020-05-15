@@ -21,6 +21,31 @@ const (
 	firehoseDeliveryStreamStatusDeleted = "DESTROYED"
 )
 
+func vpcOptionsSchema() *schema.Schema {
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		MaxItems: 1,
+		Optional: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"security_group_ids": {
+					Type:     schema.TypeList,
+					Optional: false,
+				},
+				"subnet_ids": {
+					Type:     schema.TypeList,
+					Optional: false,
+				},
+				"role_arn": {
+					Type:     schema.TypeString,
+					Optional: false, // TODO: This doesn't show up in the other providers
+					// https://docs.aws.amazon.com/sdk-for-go/api/service/firehose/#VpcConfiguration
+				},
+			},
+		},
+	}
+}
+
 func cloudWatchLoggingOptionsSchema() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeSet,
@@ -1278,6 +1303,8 @@ func resourceAwsKinesisFirehoseDeliveryStream() *schema.Resource {
 						"cloudwatch_logging_options": cloudWatchLoggingOptionsSchema(),
 
 						"processing_configuration": processingConfigurationSchema(),
+
+						"vpc_options": vpcOptionsSchema(), //TODO: SDK and docs for AWS SDK use config over options.
 					},
 				},
 			},
